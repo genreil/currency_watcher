@@ -20,6 +20,9 @@ function MyApplet(orientation) {
     this._init(orientation);
 }
 
+current_rate = '0';
+previous_rate = '0';
+
 MyApplet.prototype = {
     __proto__: Applet.TextIconApplet.prototype,
 
@@ -80,8 +83,11 @@ MyApplet.prototype = {
 
     refreshCurrency: function(){
         this.load_json_async(this.convertion_url(), function(body) {
-            var rate = body.toString().replace( /^\D+/g, '').replace( /\D+$/g, '').substring(0,6);
-            this.set_applet_label(rate);
+            current_rate = body.toString().replace( /^\D+/g, '').replace( /\D+$/g, '').substring(0,6);
+            if ( current_rate != previous_rate ){
+                this.set_applet_label(current_rate);
+                previous_rate = current_rate;
+            }
         });
         Mainloop.timeout_add_seconds(2, Lang.bind(this, function() {
             this.refreshCurrency();
