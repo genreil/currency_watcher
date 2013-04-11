@@ -10,9 +10,7 @@ const Util = imports.misc.util;
 const Mainloop = imports.mainloop;
 
 const Json = imports.gi.Json;
-// http://developer.gnome.org/libsoup/stable/libsoup-client-howto.html
 const Soup = imports.gi.Soup;
-// Soup session (see https://bugzilla.gnome.org/show_bug.cgi?id=661323#c64)
 const _httpSession = new Soup.SessionAsync();
 Soup.Session.prototype.add_feature.call(_httpSession, new Soup.ProxyResolverDefault());
 
@@ -23,8 +21,8 @@ function MyApplet(orientation) {
     this._init(orientation);
 }
 
-current_rate = '0';
-previous_rate = '0';
+current_rate = 0.0;
+previous_rate = 0.0;
 
 MyApplet.prototype = {
     __proto__: Applet.TextIconApplet.prototype,
@@ -86,11 +84,11 @@ MyApplet.prototype = {
 
     refreshCurrency: function(){
         this.load_json_async(this.convertion_url(), function(body) {
-            current_rate = body.toString().replace( /^\D+/g, '').replace( /\D+$/g, '').substring(0,6);
+            current_rate = parseFloat(body.toString().replace( /^\D+/g, '').replace( /\D+$/g, '').substring(0,6)).toFixed(2);
             if ( current_rate != previous_rate ){
                 var up_down = (current_rate < previous_rate) ? 'down' : 'up';
                 this.set_applet_icon_path(AppletDirectory + '/icons/arrow_' + up_down + '.png');
-                this.set_applet_label(current_rate);
+                this.set_applet_label(current_rate.toString());
                 previous_rate = current_rate;
             }
         });
