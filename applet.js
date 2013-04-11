@@ -98,7 +98,7 @@ MyApplet.prototype = {
     },
 
     notifyMsg: function(rate){
-        Util.spawnCommandLine("notify-send -i dialog-information 'Currency Watcher: " + rate + "'" );;
+        Util.spawnCommandLine("notify-send -i dialog-information 'Currency Watcher: " + rate + "'" );
     }
 
     // currencies: function(event) {
