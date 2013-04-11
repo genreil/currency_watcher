@@ -16,6 +16,9 @@ const Soup = imports.gi.Soup;
 const _httpSession = new Soup.SessionAsync();
 Soup.Session.prototype.add_feature.call(_httpSession, new Soup.ProxyResolverDefault());
 
+const AppletDirectory = imports.ui.appletManager.appletMeta["currency-watcher@gr"].path;
+imports.searchPath.push(AppletDirectory);
+
 function MyApplet(orientation) {
     this._init(orientation);
 }
@@ -51,7 +54,7 @@ MyApplet.prototype = {
             this.set_applet_icon_name("invest-applet");
             this.set_applet_label(this.fromCurrency + "/" + this.toCurrency);
             this.monitoringCurrencyMenuItem.label.text = "Monitoring: " + this.fromCurrency + "/" + this.toCurrency;
-            this.set_applet_tooltip(_("Click to set a currency"));
+            this.set_applet_tooltip(_("Currency Watcher"));
 
             this.refreshCurrency();
         }
@@ -85,6 +88,8 @@ MyApplet.prototype = {
         this.load_json_async(this.convertion_url(), function(body) {
             current_rate = body.toString().replace( /^\D+/g, '').replace( /\D+$/g, '').substring(0,6);
             if ( current_rate != previous_rate ){
+                var up_down = (current_rate < previous_rate) ? 'down' : 'up';
+                this.set_applet_icon_path(AppletDirectory + '/icons/arrow_' + up_down + '.png');
                 this.set_applet_label(current_rate);
                 previous_rate = current_rate;
             }
