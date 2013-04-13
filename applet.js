@@ -21,8 +21,8 @@ function MyApplet(orientation) {
     this._init(orientation);
 }
 
-current_rate = 0.0;
-previous_rate = 0.0;
+var previous_rate = 0.0;
+var previous_up_down = '';
 
 MyApplet.prototype = {
     __proto__: Applet.TextIconApplet.prototype,
@@ -84,12 +84,20 @@ MyApplet.prototype = {
 
     refreshCurrency: function(){
         this.load_json_async(this.convertion_url(), function(body) {
-            current_rate = parseFloat(body.toString().replace( /^\D+/g, '').replace( /\D+$/g, '').substring(0,6)).toFixed(2);
-            if ( current_rate != previous_rate ){
-                var up_down = (current_rate < previous_rate) ? 'down' : 'up';
-                this.set_applet_icon_path(AppletDirectory + '/icons/arrow_' + up_down + '.png');
+            // extract current rate:
+            let current_rate = parseFloat(body.toString().replace( /^\D+/g, '').replace( /\D+$/g, '').substring(0,6)).toFixed(2);
+            // update UI only if rate changed:
+            if ( !isNaN(current_rate) && current_rate != previous_rate ){
+                // find direction of the rate change:
+                let current_up_down = (current_rate < previous_rate) ? 'down' : 'up';
+                // update UI only if direction changed:
+                if ( previous_rate != 0 &&  current_up_down != previous_up_down ) {
+                    this.set_applet_icon_path(AppletDirectory + '/icons/arrow_' + up_down + '.png');
+                }
                 this.set_applet_label(current_rate.toString());
+                // set previous rate and direction:
                 previous_rate = current_rate;
+                previous_up_down = current_up_down;
             }
         });
         Mainloop.timeout_add_seconds(2, Lang.bind(this, function() {
