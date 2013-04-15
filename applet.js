@@ -100,7 +100,7 @@ MyApplet.prototype = {
                 previous_up_down = current_up_down;
             }
         });
-        Mainloop.timeout_add_seconds(2, Lang.bind(this, function() {
+        Mainloop.timeout_add_seconds(60, Lang.bind(this, function() {
             this.refreshCurrency();
         }));
     },
