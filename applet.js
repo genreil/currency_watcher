@@ -85,14 +85,14 @@ MyApplet.prototype = {
     refreshCurrency: function(){
         this.load_json_async(this.convertion_url(), function(body) {
             // extract current rate:
-            let current_rate = parseFloat(body.toString().replace( /^\D+/g, '').replace( /\D+$/g, '').substring(0,6)).toFixed(2);
+            let current_rate = parseFloat(body.toString().replace( /^\D+/g, '').replace( /\D+$/g, '').substring(0,6)).toFixed(3);
             // update UI only if rate changed:
             if ( !isNaN(current_rate) && current_rate != previous_rate ){
                 // find direction of the rate change:
                 let current_up_down = (current_rate < previous_rate) ? 'down' : 'up';
                 // update UI only if direction changed:
-                if ( previous_rate != 0 &&  current_up_down != previous_up_down ) {
-                    this.set_applet_icon_path(AppletDirectory + '/icons/arrow_' + up_down + '.png');
+                if ( previous_rate != 0.0 &&  current_up_down != previous_up_down ) {
+                    this.set_applet_icon_path(AppletDirectory + '/icons/arrow_' + current_up_down + '.png');
                 }
                 this.set_applet_label(current_rate.toString());
                 // set previous rate and direction:
