@@ -79,13 +79,16 @@ MyApplet.prototype = {
     },
 
     convertion_url: function(){
-        return "http://rate-exchange.appspot.com/currency?from=" + this.fromCurrency + "&to=" + this.toCurrency;
+        //return "http://rate-exchange.appspot.com/currency?from=" + this.fromCurrency + "&to=" + this.toCurrency;
+        return "http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate?FromCurrency=" + this.fromCurrency + "&ToCurrency=" + this.toCurrency;
     },
 
     refreshCurrency: function(){
         this.load_json_async(this.convertion_url(), function(body) {
             // extract current rate:
-            let current_rate = parseFloat(body.toString().replace( /^\D+/g, '').replace( /\D+$/g, '').substring(0,6)).toFixed(3);
+            // The old for http://rate-exchange.appspot.com/...:
+            // let current_rate = parseFloat(body.toString().replace( /^\D+/g, '').replace( /\D+$/g, '').substring(0,6)).toFixed(3);
+            let current_rate = parseFloat(body.toString().match(/>(.*)<\//)[1]).toFixed(4);
             // update UI only if rate changed:
             if ( !isNaN(current_rate) && current_rate != previous_rate ){
                 // find direction of the rate change:
