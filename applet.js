@@ -23,6 +23,16 @@ function MyApplet(orientation) {
 
 var previous_rate = 0.0;
 var previous_up_down = '';
+var fromCurrency = "USD";
+var toCurrency = "ILS";
+const currencies = ["AED","ANG","ARS","AUD","BDT","BGN","BHD","BND","BOB","BRL","BWP","CAD","CHF",
+            "CLP","CNY","COP","CRC","CZK","DKK","DOP","DZD","EEK","EGP","EUR","FJD","GBP",
+            "HKD","HNL","HRK","HUF","IDR","ILS","INR","JMD","JOD","JPY","KES","KRW","KWD",
+            "KYD","KZT","LBP","LKR","LTL","LVL","MAD","MDL","MKD","MUR","MVR","MXN","MYR",
+            "NAD","NGN","NIO","NOK","NPR","NZD","OMR","PEN","PGK","PHP","PKR","PLN","PYG",
+            "QAR","RON","RSD","RUB","SAR","SCR","SEK","SGD","SKK","SLL","SVC","THB","TND",
+            "TRY","TTD","TWD","TZS","UAH","UGX","USD","UYU","UZS","VEF","VND","XOF","YER",
+            "ZAR","ZMK"]
 
 MyApplet.prototype = {
     __proto__: Applet.TextIconApplet.prototype,
@@ -35,23 +45,20 @@ MyApplet.prototype = {
             this.menu = new Applet.AppletPopupMenu(this, orientation);
             this.menuManager.addMenu(this.menu);
 
-            this.fromCurrency = "USD";
-            this.toCurrency = "ILS";
-
-            this.monitoringCurrencyMenuItem = new PopupMenu.PopupMenuItem("Monitoring: " + this.fromCurrency + "/" + this.toCurrency, { reactive: false });
+            this.monitoringCurrencyMenuItem = new PopupMenu.PopupMenuItem("Monitoring: " + fromCurrency + "/" + toCurrency, { reactive: false });
             this.menu.addMenuItem(this.monitoringCurrencyMenuItem);
 
-            // this.fromCurrencyMenu = new PopupMenu.PopupSubMenuMenuItem(_("From Currency"));
-            // setCurrencyMenuItems(this, this.fromCurrencyMenu, this.fromCurrency);
-            // this.menu.addMenuItem(this.fromCurrencyMenu);
+            this.fromCurrencyMenu = new PopupMenu.PopupSubMenuMenuItem("From Currency");
+            this.setCurrencyMenuItems(this.fromCurrencyMenu, fromCurrency);
+            this.menu.addMenuItem(this.fromCurrencyMenu);
 
-            // this.toCurrencyMenu = new PopupMenu.PopupSubMenuMenuItem(_("To Currency"));
-            // setCurrencyMenuItems(this, this.toCurrencyMenu, this.toCurrency);
-            // this.menu.addMenuItem(this.toCurrencyMenu);
+            this.toCurrencyMenu = new PopupMenu.PopupSubMenuMenuItem("To Currency");
+            this.setCurrencyMenuItems(this.toCurrencyMenu, toCurrency);
+            this.menu.addMenuItem(this.toCurrencyMenu);
 
             this.set_applet_icon_name("invest-applet");
-            this.set_applet_label(this.fromCurrency + "/" + this.toCurrency);
-            this.monitoringCurrencyMenuItem.label.text = "Monitoring: " + this.fromCurrency + "/" + this.toCurrency;
+            this.set_applet_label(fromCurrency + "/" + toCurrency);
+            this.monitoringCurrencyMenuItem.label.text = "Monitoring: " + fromCurrency + "/" + toCurrency;
             this.set_applet_tooltip(_("Currency Watcher"));
 
             this.refreshCurrency();
@@ -63,6 +70,23 @@ MyApplet.prototype = {
 
     on_applet_clicked: function(event) {
         this.menu.toggle();
+    },
+
+    setCurrencyMenuItems: function(currencyMenu, givenCurrency) {
+        let self = this;
+        var length = currencies.length,
+            currency = null;
+        for (var i = 0; i < length; i++) {
+            currency = currencies[i];
+            this.currencyPopupMenuItem = new PopupMenu.PopupMenuItem(currency);
+            currencyMenu.menu.addMenuItem(this.currencyPopupMenuItem);
+            // this.currencyPopupMenuItem.connect('activate', Lang.bind(this,
+            //     function(givenCurrency, currency){
+            //         givenCurrency = currency;
+            //         this.monitoringCurrencyMenuItem.label.text = "Monitoring: " + fromCurrency + "/" + toCurrency;
+            //         this.notifyMsg('Monitoring ' + fromCurrency + "/" + toCurrency);
+            //     },'_output'));
+        }
     },
 
     load_json_async: function(url, fun) {
@@ -79,8 +103,8 @@ MyApplet.prototype = {
     },
 
     convertion_url: function(){
-        //return "http://rate-exchange.appspot.com/currency?from=" + this.fromCurrency + "&to=" + this.toCurrency;
-        return "http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate?FromCurrency=" + this.fromCurrency + "&ToCurrency=" + this.toCurrency;
+        //return "http://rate-exchange.appspot.com/currency?from=" + fromCurrency + "&to=" + toCurrency;
+        return "http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate?FromCurrency=" + fromCurrency + "&ToCurrency=" + toCurrency;
     },
 
     refreshCurrency: function(){
@@ -111,17 +135,6 @@ MyApplet.prototype = {
     notifyMsg: function(rate){
         Util.spawnCommandLine("notify-send -i dialog-information 'Currency Watcher: " + rate + "'" );
     }
-
-    // currencies: function(event) {
-    //     return ["AED","ANG","ARS","AUD","BDT","BGN","BHD","BND","BOB","BRL","BWP","CAD","CHF",
-    //         "CLP","CNY","COP","CRC","CZK","DKK","DOP","DZD","EEK","EGP","EUR","FJD","GBP",
-    //         "HKD","HNL","HRK","HUF","IDR","ILS","INR","JMD","JOD","JPY","KES","KRW","KWD",
-    //         "KYD","KZT","LBP","LKR","LTL","LVL","MAD","MDL","MKD","MUR","MVR","MXN","MYR",
-    //         "NAD","NGN","NIO","NOK","NPR","NZD","OMR","PEN","PGK","PHP","PKR","PLN","PYG",
-    //         "QAR","RON","RSD","RUB","SAR","SCR","SEK","SGD","SKK","SLL","SVC","THB","TND",
-    //         "TRY","TTD","TWD","TZS","UAH","UGX","USD","UYU","UZS","VEF","VND","XOF","YER",
-    //         "ZAR","ZMK"];
-    // },
 };
 
 function main(metadata, orientation) {
