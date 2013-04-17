@@ -48,25 +48,25 @@ MyApplet.prototype = {
             this.monitoringCurrencyMenuItem = new PopupMenu.PopupMenuItem("Monitoring: " + fromCurrency + "/" + toCurrency, { reactive: false });
             this.menu.addMenuItem(this.monitoringCurrencyMenuItem);
 
-            this.fromCurrencyMenu = new PopupMenu.PopupSubMenuMenuItem("From Currency");
-            this.setCurrencyMenuItems(this.fromCurrencyMenu, fromCurrency);
-            this.menu.addMenuItem(this.fromCurrencyMenu);
+            // this.fromCurrencyMenu = new PopupMenu.PopupSubMenuMenuItem("From Currency");
+            // this.setCurrencyMenuItems(this.fromCurrencyMenu, fromCurrency);
+            // this.menu.addMenuItem(this.fromCurrencyMenu);
 
-            this.toCurrencyMenu = new PopupMenu.PopupSubMenuMenuItem("To Currency");
-            this.setCurrencyMenuItems(this.toCurrencyMenu, toCurrency);
-            this.menu.addMenuItem(this.toCurrencyMenu);
+            // this.toCurrencyMenu = new PopupMenu.PopupSubMenuMenuItem("To Currency");
+            // this.setCurrencyMenuItems(this.toCurrencyMenu, toCurrency);
+            // this.menu.addMenuItem(this.toCurrencyMenu);
 
             this.set_applet_icon_name("invest-applet");
             this.set_applet_label(fromCurrency + "/" + toCurrency);
             this.monitoringCurrencyMenuItem.label.text = "Monitoring: " + fromCurrency + "/" + toCurrency;
-            this.set_applet_tooltip(_("Currency Watcher"));
+            this.set_applet_tooltip("Currency Watcher");
 
             this.refreshCurrency();
         }
         catch (e) {
             global.logError(e);
         }
-     },
+    },
 
     on_applet_clicked: function(event) {
         this.menu.toggle();
