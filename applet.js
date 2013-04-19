@@ -103,16 +103,27 @@ MyApplet.prototype = {
     },
 
     convertion_url: function(){
-        //return "http://rate-exchange.appspot.com/currency?from=" + fromCurrency + "&to=" + toCurrency;
-        return "http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate?FromCurrency=" + fromCurrency + "&ToCurrency=" + toCurrency;
+        // return "http://rate-exchange.appspot.com/currency?from=" + fromCurrency + "&to=" + toCurrency;
+        // return "http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate?FromCurrency=" + fromCurrency + "&ToCurrency=" + toCurrency;
+        return "http://query.yahooapis.com/v1/public/yql?q=select%20rate%2Cname%20from%20csv%20where%20url%3D'http%3A%2F%2Fdownload.finance.yahoo.com%2Fd%2Fquotes%3Fs%3D"+fromCurrency+toCurrency+"%253DX%26f%3Dl1n'%20and%20columns%3D'rate%2Cname'&format=json&callback=parseExchangeRate"
     },
 
     refreshCurrency: function(){
         this.load_json_async(this.convertion_url(), function(body) {
             // extract current rate:
+            
             // The old for http://rate-exchange.appspot.com/...:
             // let current_rate = parseFloat(body.toString().replace( /^\D+/g, '').replace( /\D+$/g, '').substring(0,6)).toFixed(3);
-            let current_rate = parseFloat(body.toString().match(/>(.*)<\//)[1]).toFixed(4);
+            
+            // For http://www.webservicex.net/CurrencyConvertor.asmx...:
+            // let current_rate = parseFloat(body.toString().match(/>(.*)<\//)[1]).toFixed(4);
+
+            // For http://query.yahooapis.com/v1/public/yql?...:
+            // parseExchangeRate is returned by the yahoo api.
+            // select * from yahoo.finance.xchange where pair in ("USDILS")
+            function parseExchangeRate(data) {return parseFloat(data.query.results.row.rate, 10);}
+            let current_rate = eval(body);
+            
             // update UI only if rate changed:
             if ( !isNaN(current_rate) && current_rate != previous_rate ){
                 // find direction of the rate change:
