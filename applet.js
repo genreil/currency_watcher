@@ -48,6 +48,17 @@ MyApplet.prototype = {
             this.monitoringCurrencyMenuItem = new PopupMenu.PopupMenuItem("Monitoring: " + fromCurrency + "/" + toCurrency, { reactive: false });
             this.menu.addMenuItem(this.monitoringCurrencyMenuItem);
 
+            this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+            // Slider:
+            this.refresh_interval = 15;
+            this.refresh_interval_label = "Refresh Interval (in seconds): ";
+            this.timerMenuItem = new PopupMenu.PopupMenuItem(this.refresh_interval_label + this.refresh_interval.toString(), { reactive: false });
+            this.menu.addMenuItem(this.timerMenuItem);
+            this.timerSlider = new PopupMenu.PopupSliderMenuItem(0, this.refresh_interval);
+            this.timerSlider.connect('value-changed', Lang.bind(this, this.sliderChanged));
+            this.menu.addMenuItem(this.timerSlider); 
+
             // this.fromCurrencyMenu = new PopupMenu.PopupSubMenuMenuItem("From Currency");
             // this.setCurrencyMenuItems(this.fromCurrencyMenu, fromCurrency);
             // this.menu.addMenuItem(this.fromCurrencyMenu);
@@ -70,6 +81,14 @@ MyApplet.prototype = {
 
     on_applet_clicked: function(event) {
         this.menu.toggle();
+    },
+
+    sliderChanged: function(slider, value) {
+        let position = parseFloat(value);
+        this.refresh_interval = Math.round(position/0.825 * 100);
+        if (this.refresh_interval < 1) this.refresh_interval = 1;
+        else if (this.refresh_interval > 120) this.refresh_interval = 120;
+        this.timerMenuItem.label.text = this.refresh_interval_label + this.refresh_interval.toString();  
     },
 
     setCurrencyMenuItems: function(currencyMenu, givenCurrency) {
@@ -109,6 +128,8 @@ MyApplet.prototype = {
     },
 
     refreshCurrency: function(){
+        // this.notifyMsg('Current Interval is ' + this.refresh_interval.toString());
+        
         this.load_json_async(this.convertion_url(), function(body) {
             // extract current rate:
             
@@ -145,7 +166,7 @@ MyApplet.prototype = {
                 previous_up_down = current_up_down;
             }
         });
-        Mainloop.timeout_add_seconds(30, Lang.bind(this, function() {
+        Mainloop.timeout_add_seconds(this.refresh_interval, Lang.bind(this, function() {
             this.refreshCurrency();
         }));
     },
