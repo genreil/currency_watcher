@@ -55,7 +55,7 @@ MyApplet.prototype = {
             this.refresh_interval_label = "Refresh Interval (in seconds): ";
             this.timerMenuItem = new PopupMenu.PopupMenuItem(this.refresh_interval_label + this.refresh_interval.toString(), { reactive: false });
             this.menu.addMenuItem(this.timerMenuItem);
-            this.timerSlider = new PopupMenu.PopupSliderMenuItem(0, this.refresh_interval);
+            this.timerSlider = new PopupMenu.PopupSliderMenuItem(this.refresh_interval * 0.825 / 100);
             this.timerSlider.connect('value-changed', Lang.bind(this, this.sliderChanged));
             this.menu.addMenuItem(this.timerSlider); 
 
@@ -129,7 +129,7 @@ MyApplet.prototype = {
 
     refreshCurrency: function(){
         // this.notifyMsg('Current Interval is ' + this.refresh_interval.toString());
-        
+
         this.load_json_async(this.convertion_url(), function(body) {
             // extract current rate:
             
