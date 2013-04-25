@@ -121,16 +121,24 @@ MyApplet.prototype = {
             // For http://query.yahooapis.com/v1/public/yql?...:
             // parseExchangeRate is returned by the yahoo api.
             // select * from yahoo.finance.xchange where pair in ("USDILS")
-            function parseExchangeRate(data) {return parseFloat(data.query.results.row.rate, 10);}
+            function parseExchangeRate(data) {return parseFloat(data.query.results.row.rate, 10).toFixed(4);}
             let current_rate = eval(body);
             
             // update UI only if rate changed:
             if ( !isNaN(current_rate) && current_rate != previous_rate ){
                 // find direction of the rate change:
-                let current_up_down = (current_rate < previous_rate) ? 'down' : 'up';
+                let current_up_down = '';
+                if ( current_rate < previous_rate ){
+                    current_up_down = 'down';
+                }
+                else if ( current_rate > previous_rate ){
+                    current_up_down = 'up';
+                }
                 // update UI only if direction changed:
-                if ( previous_rate != 0.0 &&  current_up_down != previous_up_down ) {
-                    this.set_applet_icon_path(AppletDirectory + '/icons/arrow_' + current_up_down + '.png');
+                if ( previous_rate != 0.0 ){
+                    if ( current_up_down != previous_up_down ) {
+                        this.set_applet_icon_path(AppletDirectory + '/icons/arrow' + current_up_down + '.png');
+                    }
                 }
                 this.set_applet_label(current_rate.toString());
                 // set previous rate and direction:
@@ -138,7 +146,7 @@ MyApplet.prototype = {
                 previous_up_down = current_up_down;
             }
         });
-        Mainloop.timeout_add_seconds(60, Lang.bind(this, function() {
+        Mainloop.timeout_add_seconds(5, Lang.bind(this, function() {
             this.refreshCurrency();
         }));
     },
