@@ -154,7 +154,7 @@ MyApplet.prototype = {
                     current_up_down = 'up';
                 }
                 // update UI only if direction changed:
-                // if you remove the (current_up_down != '') condition, you will see '->' in case of no rate change. 
+                // if you remove the (current_up_down != '') condition, you will see '->' arrow in case of no rate change. 
                 if ( previous_rate != 0.0 && current_up_down != previous_up_down && current_up_down != '' ) {
                     this.set_applet_icon_path(AppletDirectory + '/icons/arrow' + current_up_down + '.png');
                 }
