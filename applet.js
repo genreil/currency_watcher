@@ -3,6 +3,7 @@ const Applet = imports.ui.applet;
 const GLib = imports.gi.GLib;
 const Gettext = imports.gettext.domain('cinnamon-applets');
 const _ = Gettext.gettext;
+const Gio = imports.gi.Gio;
 
 const PopupMenu = imports.ui.popupMenu;
 const Main = imports.ui.main;
@@ -14,15 +15,14 @@ const Soup = imports.gi.Soup;
 const _httpSession = new Soup.SessionAsync();
 Soup.Session.prototype.add_feature.call(_httpSession, new Soup.ProxyResolverDefault());
 
-const AppletDirectory = imports.ui.appletManager.appletMeta["currency-watcher@gr"].path;
+const app_name = "currency-watcher@gr";
+const AppletDirectory = imports.ui.appletManager.appletMeta[app_name].path;
 imports.searchPath.push(AppletDirectory);
 
 function MyApplet(orientation) {
     this._init(orientation);
 }
 
-var previous_rate = 0.0;
-var previous_up_down = '';
 const currencies = ["AED","ANG","ARS","AUD","BDT","BGN","BHD","BND","BOB","BRL","BWP","CAD","CHF",
             "CLP","CNY","COP","CRC","CZK","DKK","DOP","DZD","EEK","EGP","EUR","FJD","GBP",
             "HKD","HNL","HRK","HUF","IDR","ILS","INR","JMD","JOD","JPY","KES","KRW","KWD",
@@ -30,7 +30,7 @@ const currencies = ["AED","ANG","ARS","AUD","BDT","BGN","BHD","BND","BOB","BRL",
             "NAD","NGN","NIO","NOK","NPR","NZD","OMR","PEN","PGK","PHP","PKR","PLN","PYG",
             "QAR","RON","RSD","RUB","SAR","SCR","SEK","SGD","SKK","SLL","SVC","THB","TND",
             "TRY","TTD","TWD","TZS","UAH","UGX","USD","UYU","UZS","VEF","VND","XOF","YER",
-            "ZAR","ZMK"]
+            "ZAR","ZMK"];
 
 MyApplet.prototype = {
     __proto__: Applet.TextIconApplet.prototype,
@@ -39,6 +39,11 @@ MyApplet.prototype = {
         Applet.TextIconApplet.prototype._init.call(this, orientation);
 
         try {
+            this.configs = new Gio.Settings({ schema: 'org.cinnamon.applets.'+app_name});
+            this.previous_rate = this.configs.get_double('previous-rate');
+            this.previous_up_down = this.configs.get_string('previous-up-down');
+            this.refresh_interval = this.configs.get_int('refresh-interval');
+
             this.fromCurrency = "USD";
             this.toCurrency = "ILS";
 
@@ -52,7 +57,6 @@ MyApplet.prototype = {
             this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
             // Slider:
-            this.refresh_interval = 15;
             this.refresh_interval_label = "Refresh Interval (in seconds): ";
             this.timerMenuItem = new PopupMenu.PopupMenuItem(this.refresh_interval_label + this.refresh_interval.toString(), { reactive: false });
             this.menu.addMenuItem(this.timerMenuItem);
@@ -89,7 +93,8 @@ MyApplet.prototype = {
         this.refresh_interval = Math.round(position/0.825 * 100);
         if (this.refresh_interval < 1) this.refresh_interval = 1;
         else if (this.refresh_interval > 120) this.refresh_interval = 120;
-        this.timerMenuItem.label.text = this.refresh_interval_label + this.refresh_interval.toString();  
+        this.timerMenuItem.label.text = this.refresh_interval_label + this.refresh_interval.toString();
+        this.configs.set_int('refresh-interval', this.refresh_interval);
     },
 
     setCurrencyMenuItems: function(currencyMenu, givenCurrency) {
@@ -148,24 +153,26 @@ MyApplet.prototype = {
             if ( !isNaN(current_rate) ){
                 // find direction of the rate change:
                 let current_up_down = '';
-                if ( current_rate < previous_rate ){
+                if ( current_rate < this.previous_rate ){
                     current_up_down = 'down';
                 }
-                else if ( current_rate > previous_rate ){
+                else if ( current_rate > this.previous_rate ){
                     current_up_down = 'up';
                 }
                 // update UI only if direction changed:
                 // if you remove the (current_up_down != '') condition, you will see '->' arrow in case of no rate change. 
-                if ( previous_rate != 0.0 && current_up_down != previous_up_down && current_up_down != '' ) {
+                if ( this.previous_rate != 0.0 && current_up_down != this.previous_up_down && current_up_down != '' ) {
                     this.set_applet_icon_path(AppletDirectory + '/icons/arrow' + current_up_down + '.png');
                 }
                 // update UI only if rate changed:
-                if ( current_rate != previous_rate ) {
+                if ( current_rate != this.previous_rate ) {
                     this.set_applet_label(current_rate.toString());
                 }
                 // set previous rate and direction:
-                previous_rate = current_rate;
-                previous_up_down = current_up_down;
+                this.previous_rate = current_rate;
+                this.previous_up_down = current_up_down;
+                this.configs.set_double('previous-rate', this.previous_rate);
+                this.configs.set_string('previous-up-down', this.previous_up_down);
             }
         });
         Mainloop.timeout_add_seconds(this.refresh_interval, Lang.bind(this, function() {

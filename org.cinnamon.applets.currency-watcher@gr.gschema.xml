@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="cinnamon">
+  <schema id="org.cinnamon.applets.currency-watcher@gr" path="/org/cinnamon/applets/currency-watcher@gr/">
+    <key type="d" name="previous-rate">
+      <default>0.0</default>
+      <summary>Rate on the previous reading</summary>
+      <description>Store the last rate reading</description>
+    </key>
+    <key type="s" name="previous-up-down">
+      <default>''</default>
+      <summary>Direction of rate change on the previous reading</summary>
+      <description>Store the last rate change direction</description>
+    </key>
+    <key type="i" name="refresh-interval">
+      <default>15</default>
+      <summary>Rate refresh interval in minutes</summary>
+      <description>Store refresh interval from the slider</description>
+    </key>
+  </schema>
+</schemalist>
