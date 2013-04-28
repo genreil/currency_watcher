@@ -23,8 +23,6 @@ function MyApplet(orientation) {
 
 var previous_rate = 0.0;
 var previous_up_down = '';
-var fromCurrency = "USD";
-var toCurrency = "ILS";
 const currencies = ["AED","ANG","ARS","AUD","BDT","BGN","BHD","BND","BOB","BRL","BWP","CAD","CHF",
             "CLP","CNY","COP","CRC","CZK","DKK","DOP","DZD","EEK","EGP","EUR","FJD","GBP",
             "HKD","HNL","HRK","HUF","IDR","ILS","INR","JMD","JOD","JPY","KES","KRW","KWD",
@@ -41,11 +39,14 @@ MyApplet.prototype = {
         Applet.TextIconApplet.prototype._init.call(this, orientation);
 
         try {
+            this.fromCurrency = "USD";
+            this.toCurrency = "ILS";
+
             this.menuManager = new PopupMenu.PopupMenuManager(this);
             this.menu = new Applet.AppletPopupMenu(this, orientation);
             this.menuManager.addMenu(this.menu);
 
-            this.monitoringCurrencyMenuItem = new PopupMenu.PopupMenuItem("Monitoring: " + fromCurrency + "/" + toCurrency, { reactive: false });
+            this.monitoringCurrencyMenuItem = new PopupMenu.PopupMenuItem("Monitoring: " + this.fromCurrency + "/" + this.toCurrency, { reactive: false });
             this.menu.addMenuItem(this.monitoringCurrencyMenuItem);
 
             this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
@@ -60,16 +61,16 @@ MyApplet.prototype = {
             this.menu.addMenuItem(this.timerSlider); 
 
             // this.fromCurrencyMenu = new PopupMenu.PopupSubMenuMenuItem("From Currency");
-            // this.setCurrencyMenuItems(this.fromCurrencyMenu, fromCurrency);
+            // this.setCurrencyMenuItems(this.fromCurrencyMenu, this.fromCurrency);
             // this.menu.addMenuItem(this.fromCurrencyMenu);
 
             // this.toCurrencyMenu = new PopupMenu.PopupSubMenuMenuItem("To Currency");
-            // this.setCurrencyMenuItems(this.toCurrencyMenu, toCurrency);
+            // this.setCurrencyMenuItems(this.toCurrencyMenu, this.toCurrency);
             // this.menu.addMenuItem(this.toCurrencyMenu);
 
             this.set_applet_icon_name("invest-applet");
-            this.set_applet_label(fromCurrency + "/" + toCurrency);
-            this.monitoringCurrencyMenuItem.label.text = "Monitoring: " + fromCurrency + "/" + toCurrency;
+            this.set_applet_label(this.fromCurrency + "/" + this.toCurrency);
+            this.monitoringCurrencyMenuItem.label.text = "Monitoring: " + this.fromCurrency + "/" + this.toCurrency;
             this.set_applet_tooltip("Currency Watcher");
 
             this.refreshCurrency();
@@ -102,8 +103,8 @@ MyApplet.prototype = {
             // this.currencyPopupMenuItem.connect('activate', Lang.bind(this,
             //     function(givenCurrency, currency){
             //         givenCurrency = currency;
-            //         this.monitoringCurrencyMenuItem.label.text = "Monitoring: " + fromCurrency + "/" + toCurrency;
-            //         this.notifyMsg('Monitoring ' + fromCurrency + "/" + toCurrency);
+            //         this.monitoringCurrencyMenuItem.label.text = "Monitoring: " + this.fromCurrency + "/" + this.toCurrency;
+            //         this.notifyMsg('Monitoring ' + this.fromCurrency + "/" + this.toCurrency);
             //     },'_output'));
         }
     },
@@ -122,9 +123,9 @@ MyApplet.prototype = {
     },
 
     convertion_url: function(){
-        // return "http://rate-exchange.appspot.com/currency?from=" + fromCurrency + "&to=" + toCurrency;
-        // return "http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate?FromCurrency=" + fromCurrency + "&ToCurrency=" + toCurrency;
-        return "http://query.yahooapis.com/v1/public/yql?q=select%20rate%2Cname%20from%20csv%20where%20url%3D'http%3A%2F%2Fdownload.finance.yahoo.com%2Fd%2Fquotes%3Fs%3D"+fromCurrency+toCurrency+"%253DX%26f%3Dl1n'%20and%20columns%3D'rate%2Cname'&format=json&callback=parseExchangeRate"
+        // return "http://rate-exchange.appspot.com/currency?from=" + this.fromCurrency + "&to=" + this.toCurrency;
+        // return "http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate?FromCurrency=" + this.fromCurrency + "&ToCurrency=" + this.toCurrency;
+        return "http://query.yahooapis.com/v1/public/yql?q=select%20rate%2Cname%20from%20csv%20where%20url%3D'http%3A%2F%2Fdownload.finance.yahoo.com%2Fd%2Fquotes%3Fs%3D"+this.fromCurrency+this.toCurrency+"%253DX%26f%3Dl1n'%20and%20columns%3D'rate%2Cname'&format=json&callback=parseExchangeRate"
     },
 
     refreshCurrency: function(){
