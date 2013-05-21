@@ -72,8 +72,10 @@ MyApplet.prototype = {
             // this.setCurrencyMenuItems(this.toCurrencyMenu, this.toCurrency);
             // this.menu.addMenuItem(this.toCurrencyMenu);
 
-            this.set_applet_icon_name("invest-applet");
-            this.set_applet_label(this.fromCurrency + "/" + this.toCurrency);
+            var saved_up_down = this.previous_up_down == '' ? "invest-applet" : (AppletDirectory + '/icons/arrow' + this.previous_up_down + '.png');
+            this.set_applet_icon_name(saved_up_down);
+            var saved_rate = this.previous_rate != 0.0 ? this.previous_rate.toString() : this.fromCurrency + "/" + this.toCurrency
+            this.set_applet_label(saved_rate);
             this.monitoringCurrencyMenuItem.label.text = "Monitoring: " + this.fromCurrency + "/" + this.toCurrency;
             this.set_applet_tooltip("Currency Watcher");
 
@@ -163,16 +165,17 @@ MyApplet.prototype = {
                 // if you remove the (current_up_down != '') condition, you will see '->' arrow in case of no rate change. 
                 if ( this.previous_rate != 0.0 && current_up_down != this.previous_up_down && current_up_down != '' ) {
                     this.set_applet_icon_path(AppletDirectory + '/icons/arrow' + current_up_down + '.png');
+                    // set previous direction:
+                    this.previous_up_down = current_up_down;
+                    this.configs.set_string('previous-up-down', this.previous_up_down);
                 }
                 // update UI only if rate changed:
                 if ( current_rate != this.previous_rate ) {
                     this.set_applet_label(current_rate.toString());
+                    // set previous rate:
+                    this.previous_rate = current_rate;
+                    this.configs.set_double('previous-rate', this.previous_rate);
                 }
-                // set previous rate and direction:
-                this.previous_rate = current_rate;
-                this.previous_up_down = current_up_down;
-                this.configs.set_double('previous-rate', this.previous_rate);
-                this.configs.set_string('previous-up-down', this.previous_up_down);
             }
         });
         Mainloop.timeout_add_seconds(this.refresh_interval, Lang.bind(this, function() {
