@@ -132,7 +132,8 @@ MyApplet.prototype = {
     convertion_url: function(){
         // return "http://rate-exchange.appspot.com/currency?from=" + this.fromCurrency + "&to=" + this.toCurrency;
         // return "http://www.webservicex.net/CurrencyConvertor.asmx/ConversionRate?FromCurrency=" + this.fromCurrency + "&ToCurrency=" + this.toCurrency;
-        return "http://query.yahooapis.com/v1/public/yql?q=select%20rate%2Cname%20from%20csv%20where%20url%3D'http%3A%2F%2Fdownload.finance.yahoo.com%2Fd%2Fquotes%3Fs%3D"+this.fromCurrency+this.toCurrency+"%253DX%26f%3Dl1n'%20and%20columns%3D'rate%2Cname'&format=json&callback=parseExchangeRate"
+        // return "http://query.yahooapis.com/v1/public/yql?q=select%20rate%2Cname%20from%20csv%20where%20url%3D'http%3A%2F%2Fdownload.finance.yahoo.com%2Fd%2Fquotes%3Fs%3D"+this.fromCurrency+this.toCurrency+"%253DX%26f%3Dl1n'%20and%20columns%3D'rate%2Cname'&format=json&callback=parseExchangeRate"
+        return "https://api.exchangeratesapi.io/latest?symbols=" + this.fromCurrency + "," + this.toCurrency;
     },
 
     refreshCurrency: function(){
