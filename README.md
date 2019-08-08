@@ -9,7 +9,7 @@ One can change the refresh frequency on the following line:
 
 Mainloop.timeout_add_seconds(2, Lang.bind(this, function()...
 
-=======================
+
 From author
 =======================
 
